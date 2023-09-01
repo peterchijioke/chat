@@ -23,6 +23,7 @@ select:focus {
   text-decoration: none;
   background: #2979ff;
   padding: 20px;
+  cursor: pointer;
   display: inline-block;
   border: none;
   width: 20%;

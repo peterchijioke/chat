@@ -23,7 +23,7 @@ body {
 }
 
 .joinInnerContainer {
-  width: 20%;
+  width: 50%;
 }
 
 .joinInput {
@@ -43,6 +43,7 @@ body {
   color: #fff !important;
   text-transform: uppercase;
   text-decoration: none;
+  cursor: pointer;
   background: #2979ff;
   padding: 20px;
   border-radius: 5px;

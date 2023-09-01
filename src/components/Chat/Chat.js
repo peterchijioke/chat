@@ -1,70 +1,79 @@
 import React, { useState, useEffect } from "react";
-import queryString from "query-string";
 import io from "socket.io-client";
-
-import TextContainer from "../TextContainer/TextContainer";
+import { useLocation } from "react-router-dom";
 import Messages from "../Messages/Messages";
 import InfoBar from "../InfoBar/InfoBar";
 import Input from "../Input/Input";
 
 import "./Chat.css";
 
-const ENDPOINT = "https://project-chat-application.herokuapp.com/";
-
 let socket;
 
-const Chat = ({ location }) => {
-  const [name, setName] = useState("");
-  const [room, setRoom] = useState("");
-  const [users, setUsers] = useState("");
-  const [message, setMessage] = useState("");
+const Chat = ({}) => {
+  const [customer, setCustomer] = useState("");
+  const [subject, setSubject] = useState("");
+  const [email, setEmail] = useState("");
+  const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
+  const [platform, setPlatform] = useState("");
+  const [users, setUsers] = useState([]);
+  const ENDPOINT = "localhost:9000";
+  const { state } = useLocation();
 
   useEffect(() => {
-    const { name, room } = queryString.parse(location.search);
+    const { customer, subject, email, platform } = state;
+    console.log("================================", state);
 
     socket = io(ENDPOINT);
+    setSubject(subject);
+    setCustomer(customer);
+    setEmail(email);
+    setPlatform(platform);
+    const data = {
+      customer,
+      subject,
+      email,
+      platform_url: "https://packmateindustries.com/",
+    };
 
-    setRoom(room);
-    setName(name);
-
-    socket.emit("join", { name, room }, (error) => {
+    socket.emit("join", data, (error) => {
       if (error) {
-        alert(error);
+        alert(error.message);
       }
     });
-  }, [ENDPOINT, location.search]);
+
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  }, [ENDPOINT, state]);
 
   useEffect(() => {
     socket.on("message", (message) => {
+      console.log(message);
       setMessages((messages) => [...messages, message]);
-    });
-
-    socket.on("roomData", ({ users }) => {
-      setUsers(users);
     });
   }, []);
 
+  // useEffect(() => {
+  //   socket.on("users", (users_data) => {});
+  // }, []);
+
   const sendMessage = (event) => {
     event.preventDefault();
-
-    if (message) {
-      socket.emit("sendMessage", message, () => setMessage(""));
+    if (text) {
+      socket.emit("sendMessage", text, () => setText(""));
     }
   };
 
   return (
     <div className="outerContainer">
       <div className="container">
-        <InfoBar room={room} />
-        <Messages messages={messages} name={name} />
-        <Input
-          message={message}
-          setMessage={setMessage}
-          sendMessage={sendMessage}
-        />
+        <InfoBar room={subject} />
+        <Messages messages={messages} name={customer} />
+        <Input message={text} setMessage={setText} sendMessage={sendMessage} />
       </div>
-      <TextContainer users={users} />
+      {/* <TextContainer users={users} /> */}
     </div>
   );
 };
