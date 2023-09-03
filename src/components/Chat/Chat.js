@@ -50,19 +50,14 @@ const Chat = ({}) => {
 
   useEffect(() => {
     socket.on("message", (message) => {
-      console.log(message);
       setMessages((messages) => [...messages, message]);
     });
   }, []);
 
-  // useEffect(() => {
-  //   socket.on("users", (users_data) => {});
-  // }, []);
-
   const sendMessage = (event) => {
     event.preventDefault();
     if (text) {
-      socket.emit("sendMessage", text, () => setText(""));
+      socket.emit("sendMessage", { message: text }, () => setText(""));
     }
   };
 
